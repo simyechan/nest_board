@@ -23,7 +23,7 @@ export class Boards extends BaseEntity {
   @Column({ type: 'bytea', nullable: true })
   image: Buffer;
 
-  @OneToMany(() => Comment, (comment) => comment.board)
+  @OneToMany(() => Comment, (comment) => comment.board, { cascade: true })
   comments: Comment[];
 
   @ManyToOne(() => User, (user) => user.board)
