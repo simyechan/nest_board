@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Reply } from './reply.entity';
-import { createReplyDto } from './dto/createReply.dto';
+import { createReplyDto } from './dto/req/createReply.dto';
 import { Comment } from 'src/comment/comment.entity';
+import { User } from 'src/user/board.user-entity';
 
 @Injectable()
 export class ReplyRepository extends Repository<Reply> {
@@ -16,6 +17,7 @@ export class ReplyRepository extends Repository<Reply> {
 
   async createR(
     commentId: number,
+    userId: string,
     createReplyDto: createReplyDto,
   ): Promise<Reply> {
     const { content } = createReplyDto;
@@ -29,9 +31,18 @@ export class ReplyRepository extends Repository<Reply> {
         throw new NotFoundException('댓글을 찾을 수 없습니다.');
       }
 
+      const user = await this.dataSource.getRepository(User).findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+
       const reply = this.create({
         content,
         comments: comment,
+        user,
       });
 
       await this.save(reply);

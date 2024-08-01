@@ -1,5 +1,6 @@
 import { Boards } from 'src/board/board.entity';
 import { Comment } from 'src/comment/comment.entity';
+import { Reply } from 'src/reply/reply.entity';
 import {
   BaseEntity,
   Column,
@@ -24,6 +25,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Boards, (board) => board.user, { cascade: true })
   board: Boards;
+
+  @OneToMany(() => Reply, (reply) => reply.user, { cascade: true })
+  reply: Reply;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createAt: Date;

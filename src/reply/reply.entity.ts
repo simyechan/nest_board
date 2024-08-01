@@ -1,4 +1,5 @@
 import { Comment } from 'src/comment/comment.entity';
+import { User } from 'src/user/board.user-entity';
 import {
   BaseEntity,
   Column,
@@ -18,4 +19,7 @@ export class Reply extends BaseEntity {
 
   @ManyToOne(() => Comment, (comment) => comment.reply, { nullable: true })
   comments: Comment;
+
+  @ManyToOne(() => User, (user) => user.reply)
+  user: User;
 }
