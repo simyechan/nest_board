@@ -4,6 +4,7 @@ import { ReplyRepository } from './reply.repository';
 import { createReplyDto } from './dto/req/createReply.dto';
 import { Reply } from './reply.entity';
 import { findReplyDto } from './dto/res/findReply.dto';
+import { updateReplyDto } from './dto/res/updateReply.dto';
 
 @Injectable()
 export class ReplyService {
@@ -65,6 +66,15 @@ export class ReplyService {
         throw error;
       }
       console.error('답글 삭제 중 오류 발생', error);
+    }
+  }
+
+  async update(replyId: number, updateReplyDto: updateReplyDto): Promise<void> {
+    try {
+      const { content } = updateReplyDto;
+      this.replyRepository.update({ id: replyId }, { content });
+    } catch (error) {
+      console.error('답글 업데이트 중 오류가 발생', error);
     }
   }
 }

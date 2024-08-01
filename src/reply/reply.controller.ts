@@ -1,8 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ReplyService } from './reply.service';
 import { createReplyDto } from './dto/req/createReply.dto';
 import { Reply } from './reply.entity';
 import { findReplyDto } from './dto/res/findReply.dto';
+import { updateReplyDto } from './dto/res/updateReply.dto';
 
 @Controller('reply')
 export class ReplyController {
@@ -25,5 +34,13 @@ export class ReplyController {
   @Delete(':replyId')
   async delete(@Param('replyId') replyId): Promise<void> {
     this.replyService.delete(replyId);
+  }
+
+  @Patch(':replyId')
+  async update(
+    @Param('replyId') replyId,
+    @Body() updateReplyDto: updateReplyDto,
+  ): Promise<void> {
+    this.replyService.update(replyId, updateReplyDto);
   }
 }
