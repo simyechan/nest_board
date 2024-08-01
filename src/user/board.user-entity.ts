@@ -3,15 +3,19 @@ import { Comment } from 'src/comment/comment.entity';
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -21,4 +25,13 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Boards, (board) => board.user)
   board: Boards;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updateAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz' })
+  deleteAt?: Date;
 }

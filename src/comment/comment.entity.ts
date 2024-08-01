@@ -2,13 +2,13 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Boards } from '../board/board.entity';
 import { User } from 'src/user/board.user-entity';
+import { Reply } from 'src/reply/reply.entity';
 
 @Entity()
 export class Comment extends BaseEntity {
@@ -21,12 +21,8 @@ export class Comment extends BaseEntity {
   @ManyToOne(() => Boards, (board) => board.comments)
   board: Boards;
 
-  @ManyToOne(() => Comment, (comment) => comment.reply, { nullable: true })
-  @JoinColumn()
-  comments: Comment;
-
-  @OneToOne(() => Comment, (comment) => comment.comments)
-  reply: Comment;
+  @OneToMany(() => Reply, (reply) => reply.comments)
+  reply: Reply[];
 
   @ManyToOne(() => User, (user) => user.comment)
   user: User;
