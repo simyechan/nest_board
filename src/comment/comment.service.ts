@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentRepository } from './comment.repository';
-import { createCommentDto } from './dto/createCommentDto';
+import { createCommentDto } from './dto/createComment.dto';
 import { Comment } from './comment.entity';
 
 @Injectable()
@@ -11,35 +11,33 @@ export class CommentService {
     private commentRepository: CommentRepository,
   ) {}
 
-  async createComment(
+  async create(
     boardId: number,
     createCommentDto: createCommentDto,
   ): Promise<Comment> {
-    return this.commentRepository.createComment(boardId, createCommentDto);
-  }
-
-  async getComment(boardId: number): Promise<Comment[]> {
-    return this.commentRepository.find({ where: { board: { id: boardId } } });
-  }
-
-  async createReply(
-    commentId: number,
-    createCommentDto: createCommentDto,
-  ): Promise<Comment> {
-    const alreadyReply = await this.commentRepository.findOne({
-      where: { comments: { id: commentId } },
-    });
-
-    if (alreadyReply) {
-      throw new Error('There is already a reply');
+    try {
+      return this.commentRepository.createC(boardId, createCommentDto);
+    } catch (error) {
+      console.error('댓글 생성 중 오류 발생', error);
     }
-
-    return this.commentRepository.createReply(commentId, createCommentDto);
   }
 
-  async getReply(commentId: number): Promise<Comment> {
-    return this.commentRepository.findOne({
-      where: { comments: { id: commentId } },
-    });
+  async find(boardId: number): Promise<Comment[]> {
+    try {
+      const comment = this.commentRepository.find({
+        where: { board: { id: boardId } },
+      });
+
+      if (!comment) {
+        throw new NotFoundException('댓글을 찾을 수 없습니다.');
+      }
+
+      return comment;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('댓글 조회 중 오류 발생', error);
+    }
   }
 }
