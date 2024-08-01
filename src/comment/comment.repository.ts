@@ -1,52 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Comment } from './comment.entity';
-import { createCommentDto } from './dto/createCommentDto';
+import { createCommentDto } from './dto/createComment.dto';
 import { Boards } from 'src/board/board.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CommentRepository extends Repository<Comment> {
-  constructor(private dataSource: DataSource) {
+  constructor(
+    private dataSource: DataSource,
+    // @InjectRepository(Boards) private repository,
+  ) {
     super(Comment, dataSource.createEntityManager());
   }
 
-  async createComment(
+  async createC(
     boardId: number,
     createCommentDto: createCommentDto,
   ): Promise<Comment> {
     const { content } = createCommentDto;
 
-    const board = await this.dataSource.getRepository(Boards).findOne({
-      where: { id: boardId },
-    });
+    try {
+      const board = await this.dataSource.getRepository(Boards).findOne({
+        where: { id: boardId },
+      });
 
-    const comment = this.create({
-      content,
-      board,
-    });
+      if (!board) {
+        throw new NotFoundException('게시물을 찾을 수 없습니다.');
+      }
 
-    await this.save(comment);
+      const comment = this.create({
+        content,
+        board,
+      });
 
-    return comment;
-  }
+      await this.save(comment);
 
-  async createReply(
-    commentId: number,
-    createCommentDto: createCommentDto,
-  ): Promise<Comment> {
-    const { content } = createCommentDto;
-
-    const comment = await this.dataSource.getRepository(Comment).findOne({
-      where: { id: commentId },
-    });
-
-    const reply = this.create({
-      content,
-      comments: comment,
-    });
-
-    await this.save(reply);
-
-    return comment;
+      return comment;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        '댓글 생성 중 오류가 발생했습니다.',
+      );
+    }
   }
 }
