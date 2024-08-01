@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Boards } from './board.entity';
-import { createBoardDto } from './dto/createBoard.dto';
+import { createBoardDto } from './dto/req/createBoard.dto';
 import { User } from 'src/user/board.user-entity';
-import { updateBoardDto } from './dto/updateBoard.dto';
+import { updateBoardDto } from './dto/req/updateBoard.dto';
 
 @Injectable()
 export class BoardRepository extends Repository<Boards> {

@@ -12,8 +12,8 @@ import {
 import { Boards } from './board.entity';
 import { BoardService } from './board.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createBoardDto } from './dto/createBoard.dto';
-import { updateBoardDto } from './dto/updateBoard.dto';
+import { createBoardDto } from './dto/req/createBoard.dto';
+import { updateBoardDto } from './dto/req/updateBoard.dto';
 
 @Controller('boards')
 export class BoardsController {
