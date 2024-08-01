@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { UserRepository } from "./user.repository";
-import { BoardRepository } from "src/board/board.repository";
-import { CommentRepository } from "src/comment/comment.repository";
-import { User } from "./board.user-entity";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserRepository } from './user.repository';
+import { BoardRepository } from 'src/board/board.repository';
+import { CommentRepository } from 'src/comment/comment.repository';
+import { User } from './board.user-entity';
 
 @Injectable()
 export class UserService {
@@ -26,23 +26,16 @@ export class UserService {
         throw new NotFoundException('사용자를 찾을 수 없습니다.');
       }
 
-      const boardResult = await this.boardRepository
-        .createQueryBuilder('board')
-        .select('COUNT(board.id)', 'count')
-        .where('board.userId = :userId', { userId })
-        .getRawOne();
+      const result = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.board', 'board')
+        .leftJoinAndSelect('user.comment', 'comment')
+        .where('user.id = :userId', { userId })
+        .select(['COUNT(board.id) AS B', 'COUNT(comment.id) AS C'])
+        .getRawOne(); //innerjoin, subquery
 
-      const commentResult = await this.commentRepository
-        .createQueryBuilder('comment')
-        .select('COUNT(comment.id)', 'count')
-        .where('comment.userId = :userId', { userId })
-        .getRawOne();
-
-      // const result = await this.userRepository
-      // .createQueryBuilder('user')
-
-      const boardCount = parseInt(boardResult.count, 10);
-      const commentCount = parseInt(commentResult.count, 10);
+      const boardCount = parseInt(result.B, 10);
+      const commentCount = parseInt(result.C, 10);
 
       return { user, boardCount, commentCount };
     } catch (error) {
