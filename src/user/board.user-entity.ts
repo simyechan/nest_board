@@ -6,7 +6,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -20,10 +19,10 @@ export class User extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
   comment: Comment;
 
-  @OneToMany(() => Boards, (board) => board.user)
+  @OneToMany(() => Boards, (board) => board.user, { cascade: true })
   board: Boards;
 
   @CreateDateColumn({ type: 'timestamptz' })

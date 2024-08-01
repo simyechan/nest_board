@@ -21,7 +21,7 @@ export class Comment extends BaseEntity {
   @ManyToOne(() => Boards, (board) => board.comments)
   board: Boards;
 
-  @OneToMany(() => Reply, (reply) => reply.comments)
+  @OneToMany(() => Reply, (reply) => reply.comments, { cascade: true })
   reply: Reply[];
 
   @ManyToOne(() => User, (user) => user.comment)
