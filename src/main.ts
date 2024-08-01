@@ -4,7 +4,10 @@ import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-  Logger.log(`running`)
+
+  const port = parseInt(process.env.PORT, 10);
+  
+  await app.listen(port);
+  Logger.log(`running ${port}`);
 }
 bootstrap();
