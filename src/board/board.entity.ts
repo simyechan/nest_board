@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -27,5 +28,6 @@ export class Boards extends BaseEntity {
   comments: Comment[];
 
   @ManyToOne(() => User, (user) => user.board)
+  @JoinColumn({ name: 'userId' })
   user: User;
 }

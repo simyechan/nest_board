@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -25,5 +26,6 @@ export class Comment extends BaseEntity {
   reply: Reply[];
 
   @ManyToOne(() => User, (user) => user.comment)
+  @JoinColumn({name: 'userId'})
   user: User;
 }
