@@ -5,6 +5,8 @@ import { BoardRepository } from './board.repository';
 import { createBoardDto } from './dto/req/createBoard.dto';
 import { updateBoardDto } from './dto/req/updateBoard.dto';
 import { CommentRepository } from 'src/comment/comment.repository';
+import { Reply } from 'src/reply/reply.entity';
+import { ReplyRepository } from 'src/reply/reply.repository';
 
 @Injectable()
 export class BoardService {
@@ -13,9 +15,17 @@ export class BoardService {
     private boardRepository: BoardRepository,
     @InjectRepository(CommentRepository)
     private commentRepository: CommentRepository,
+    @InjectRepository(ReplyRepository)
+    private replyRepository: ReplyRepository,
   ) {}
 
-  async findAll(): Promise<{ board: Boards; commentCount: number }[]> {
+  async findAll(): Promise<
+    {
+      board: Boards;
+      commentCount: number;
+      repliesCount: number;
+    }[]
+  > {
     try {
       const boards = this.boardRepository.find({
         relations: ['user', 'comments'],
@@ -39,9 +49,29 @@ export class BoardService {
         commentCounts.map((item) => [item.boardId, parseInt(item.count, 10)]),
       );
 
+      const repliesCounts = await Promise.all(
+        (await boards).map(async (board) => {
+          let repliesResult = await this.replyRepository
+            .createQueryBuilder('reply')
+            .select('COUNT(reply.id)', 'count')
+            .innerJoin('reply.comments', 'comment')
+            .where('comment.boardId = :boardId', { boardId: board.id })
+            .getRawOne();
+          return {
+            boardId: board.id,
+            count: (repliesResult = parseInt(repliesResult.count, 10) || 0),
+          };
+        }),
+      );
+
+      const repliesCountMap = new Map(
+        repliesCounts.map((item) => [item.boardId, item.count]),
+      );
+
       const results = (await boards).map((board) => {
         const commentCount = commentCountMap.get(board.id) || 0;
-        return { board, commentCount };
+        const repliesCount = repliesCountMap.get(board.id) || 0;
+        return { board, commentCount, repliesCount };
       });
 
       return results;
@@ -64,13 +94,16 @@ export class BoardService {
     }
   }
 
-  async find(
-    boardId: number,
-  ): Promise<{ board: Boards; commentCount: number }> {
+  async find(boardId: number): Promise<{
+    board: Boards;
+    commentCount: number;
+    replies: Reply[];
+    repliesCount: number;
+  }> {
     try {
       const board = await this.boardRepository.findOne({
         where: { id: boardId },
-        relations: ['user', 'comments'],
+        relations: ['user', 'comments', 'comments.reply'],
       });
 
       if (!board) {
@@ -85,7 +118,23 @@ export class BoardService {
 
       const commentCount = parseInt(commentResult.count, 10);
 
-      return { board, commentCount };
+      const repliesResult = await this.replyRepository
+        .createQueryBuilder('reply')
+        .select('COUNT(reply.id)', 'count')
+        .innerJoin('reply.comments', 'comment')
+        .where('comment.boardId = :boardId', { boardId })
+        .getRawOne();
+
+      const repliesCount = parseInt(repliesResult.count, 10);
+
+      const replyResult = await this.commentRepository.find({
+        where: { board: { id: boardId } },
+        relations: ['reply'],
+      });
+
+      const replies = replyResult.flatMap((comment) => comment.reply);
+
+      return { board, commentCount, replies, repliesCount };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

@@ -14,6 +14,7 @@ import { BoardService } from './board.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createBoardDto } from './dto/req/createBoard.dto';
 import { updateBoardDto } from './dto/req/updateBoard.dto';
+import { Reply } from 'src/reply/reply.entity';
 
 @Controller('boards')
 export class BoardsController {
@@ -25,9 +26,12 @@ export class BoardsController {
   }
 
   @Get(':boardId')
-  async find(
-    @Param('boardId') boardId: number,
-  ): Promise<{ board: Boards; commentCount: number }> {
+  async find(@Param('boardId') boardId: number): Promise<{
+    board: Boards;
+    commentCount: number;
+    replies: Reply[];
+    repliesCount: number;
+  }> {
     return this.boardService.find(boardId);
   }
 

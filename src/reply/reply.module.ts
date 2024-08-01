@@ -7,7 +7,8 @@ import { ReplyRepository } from './reply.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Reply])],
-  controllers: [ReplyController],
   providers: [ReplyService, ReplyRepository],
+  exports: [ReplyRepository],
+  controllers: [ReplyController],
 })
 export class ReplyModule {}
