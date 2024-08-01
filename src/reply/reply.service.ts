@@ -52,4 +52,19 @@ export class ReplyService {
       console.error('답글 조회 중 오류 발생', error);
     }
   }
+
+  async delete(replyId: number): Promise<void> {
+    try {
+      const result = await this.replyRepository.delete(replyId);
+
+      if (result.affected === 0) {
+        throw new NotFoundException('답글을 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('답글 삭제 중 오류 발생', error);
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ReplyService } from './reply.service';
 import { createReplyDto } from './dto/req/createReply.dto';
 import { Reply } from './reply.entity';
@@ -20,5 +20,10 @@ export class ReplyController {
   @Get(':commentId')
   async find(@Param('commentId') commentId): Promise<findReplyDto[]> {
     return this.replyService.find(commentId);
+  }
+
+  @Delete(':replyId')
+  async delete(@Param('replyId') replyId): Promise<void> {
+    this.replyService.delete(replyId);
   }
 }
