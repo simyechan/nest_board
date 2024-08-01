@@ -37,7 +37,7 @@ export class CommentService {
 
       return (await comment).map((comment) => {
         if (!comment.user) {
-          throw new NotFoundException('댓글 작성자 정보가 누락되었습니다.');
+          throw new NotFoundException('작성자 정보가 누락되었습니다.');
         }
         return {
           id: comment.id,
