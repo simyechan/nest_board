@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Boards } from './board.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardRepository } from './board.repository';
-import { createBoardDto } from './dto/createBoard.dto';
-import { updateBoardDto } from './dto/updateBoard.dto';
+import { createBoardDto } from './dto/req/createBoard.dto';
+import { updateBoardDto } from './dto/req/updateBoard.dto';
 import { CommentRepository } from 'src/comment/comment.repository';
 
 @Injectable()
