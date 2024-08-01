@@ -14,7 +14,7 @@ export class UserController {
   }
 
   @Get()
-  async users(): Promise<User> {
-    return;
+  async users(): Promise<User[]> {
+    return this.userService.users();
   }
 }

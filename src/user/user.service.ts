@@ -69,6 +69,21 @@ export class UserService {
       console.error('마이페이지를 불러오는 중 오류 발생', error);
     }
   }
+
+  async users(): Promise<User[]> {
+    try {
+      const user = this.userRepository.find();
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.log('사용자 조회 중 오류 발생', error);
+    }
+  }
 }
 
 // const result = await this.userRepository
