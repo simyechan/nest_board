@@ -52,4 +52,19 @@ export class CommentService {
       console.error('댓글 조회 중 오류 발생', error);
     }
   }
+
+  async delete(commentId: number): Promise<void> {
+    try {
+      const result = await this.commentRepository.delete(commentId);
+
+      if (result.affected === 0) {
+        throw new NotFoundException('댓글을 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('댓글 삭제 중 오류 발생', error);
+    }
+  }
 }
