@@ -4,6 +4,7 @@ import { CommentRepository } from './comment.repository';
 import { createCommentDto } from './dto/req/createComment.dto';
 import { Comment } from './comment.entity';
 import { findCommentDto } from './dto/res/findComment.dto';
+import { updateCommentDto } from './dto/req/updateComment.dto';
 
 @Injectable()
 export class CommentService {
@@ -65,6 +66,18 @@ export class CommentService {
         throw error;
       }
       console.error('댓글 삭제 중 오류 발생', error);
+    }
+  }
+
+  async update(
+    commentId: number,
+    updateCommentDto: updateCommentDto,
+  ): Promise<void> {
+    try {
+      const { content } = updateCommentDto;
+      this.commentRepository.update({ id: commentId }, { content });
+    } catch (error) {
+      console.error('댓글 업데이트 중 오류가 발생', error);
     }
   }
 }

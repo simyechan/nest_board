@@ -92,6 +92,7 @@ export class BoardRepository extends Repository<Boards> {
       }
       throw new InternalServerErrorException(
         '게시물 업데이트 중 오류가 발생했습니다.',
+        error,
       );
     }
   }
