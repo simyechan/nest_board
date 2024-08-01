@@ -8,7 +8,7 @@ import { CommentRepository } from './comment.repository';
 @Module({
   imports: [TypeOrmModule.forFeature([Comment])],
   providers: [CommentService, CommentRepository],
-  exports: [CommentService],
+  exports: [CommentService, CommentRepository],
   controllers: [CommentController],
 })
 export class CommentModule {}
