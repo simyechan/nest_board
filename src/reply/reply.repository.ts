@@ -42,7 +42,7 @@ export class ReplyRepository extends Repository<Reply> {
       const reply = this.create({
         content,
         comments: comment,
-        user,
+        userId: user.id,
       });
 
       await this.save(reply);

@@ -6,6 +6,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 
 @Entity()
@@ -16,9 +17,13 @@ export class Reply extends BaseEntity {
   @Column()
   content: string;
 
-  @ManyToOne(() => Comment, (comment) => comment.reply, { nullable: true })
+  @ManyToOne(() => Comment, (comment) => comment.reply)
   comments: Comment;
 
   @ManyToOne(() => User, (user) => user.reply)
   user: User;
+
+  @Column({ type: 'uuid', nullable: true })
+  @RelationId((reply: Reply) => reply.user)
+  userId: string;
 }
