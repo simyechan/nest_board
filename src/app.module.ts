@@ -9,6 +9,7 @@ import { User } from './user/board.user-entity';
 import { Boards } from './board/board.entity';
 import { Comment } from './comment/comment.entity';
 import { Reply } from './reply/reply.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { Reply } from './reply/reply.entity';
     CommentModule,
     ReplyModule,
     UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

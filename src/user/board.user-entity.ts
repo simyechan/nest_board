@@ -17,8 +17,12 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  // @Column({ unique: true })
   @Column()
   name: string;
+
+  @Column({ nullable: true })
+  password: string;
 
   @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
   comment: Comment;
