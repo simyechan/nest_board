@@ -21,14 +21,16 @@ export class BoardRepository extends Repository<Boards> {
   ): Promise<Boards> {
     const { name, ...other } = createBoardDto;
 
-    if (file) {
-      console.log('파일이 제공되었습니다:', file.originalname);
-      console.log('파일 버퍼 길이:', file.buffer.length);
+    if (!file) {
+      if (file.buffer) {
+        console.log('파일 버퍼 길이:', file.buffer.length);
+      } else {
+        console.error('파일 버퍼가 존재하지 않습니다.');
+        throw new Error('파일 버퍼가 존재하지 않습니다.');
+      }
     } else {
       console.log('파일이 제공되지 않았습니다.');
     }
-
-    const imageBuffer = file ? file.buffer : null;
 
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -44,7 +46,7 @@ export class BoardRepository extends Repository<Boards> {
 
       const board = queryRunner.manager.create(Boards, {
         ...other,
-        image: imageBuffer,
+        image: file.path,
         user,
       });
 
@@ -80,7 +82,7 @@ export class BoardRepository extends Repository<Boards> {
         board.contents = updateBoardDto.contents;
       }
       if (file) {
-        board.image = file.buffer;
+        board.image = file.path;
       }
 
       const result = await this.save(board);

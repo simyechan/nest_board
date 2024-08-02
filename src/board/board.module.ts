@@ -5,9 +5,10 @@ import { Boards } from './board.entity';
 import { BoardRepository } from './board.repository';
 import { BoardsController } from './board.controller';
 import { MulterModule } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
+import { diskStorage } from 'multer';
 import { CommentModule } from 'src/comment/comment.module';
 import { ReplyModule } from 'src/reply/reply.module';
+import { v4 as uuidv4 } from 'uuid';
 
 @Module({
   imports: [
@@ -15,7 +16,14 @@ import { ReplyModule } from 'src/reply/reply.module';
     ReplyModule,
     TypeOrmModule.forFeature([Boards]),
     MulterModule.register({
-      storage: memoryStorage(),
+      storage: diskStorage({
+        destination: './upload',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = uuidv4() + '-' + Date.now();
+          const ext = file.originalname.split('.').pop();
+          cb(null, `${uniqueSuffix}.${ext}`);
+        },
+      }),
     }),
   ],
   providers: [BoardService, BoardRepository],

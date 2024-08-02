@@ -21,8 +21,8 @@ export class Boards extends BaseEntity {
   @Column()
   contents: string;
 
-  @Column({ type: 'bytea', nullable: true })
-  image: Buffer;
+  @Column({ nullable: true })
+  image: string;
 
   @OneToMany(() => Comment, (comment) => comment.board, { cascade: true })
   comments: Comment[];
