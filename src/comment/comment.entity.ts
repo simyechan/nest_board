@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 import { Boards } from '../board/board.entity';
 import { User } from 'src/user/board.user-entity';
@@ -23,8 +24,16 @@ export class Comment extends BaseEntity {
   @JoinColumn({ name: 'userId' })
   user: User;
 
+  @Column({ type: 'uuid', nullable: true })
+  @RelationId((comment: Comment) => comment.user)
+  userId: string;
+
   @ManyToOne(() => Boards, (board) => board.comments)
   board: Boards;
+
+  @Column({type: 'int', nullable: true})
+  @RelationId((comment: Comment) => comment.board)
+  boardId: number
 
   @OneToMany(() => Reply, (reply) => reply.comments, { cascade: true })
   reply: Reply[];

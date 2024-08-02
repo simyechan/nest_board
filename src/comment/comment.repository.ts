@@ -44,8 +44,8 @@ export class CommentRepository extends Repository<Comment> {
 
       const comment = this.create({
         content,
-        board,
-        user,
+        boardId: board.id,
+        userId: user.id,
       });
 
       await this.save(comment);
