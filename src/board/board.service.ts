@@ -27,7 +27,7 @@ export class BoardService {
     }[]
   > {
     try {
-      const boards = this.boardRepository.find({
+      const boards = await this.boardRepository.find({
         relations: ['user', 'comments'],
       });
 
@@ -35,7 +35,7 @@ export class BoardService {
         throw new NotFoundException('게시물을 찾을 수 없습니다');
       }
 
-      const boardIds = (await boards).map((board) => board.id);
+      const boardIds = boards.map((board) => board.id);
 
       const commentCounts = await this.commentRepository
         .createQueryBuilder('comment')
@@ -68,7 +68,7 @@ export class BoardService {
         repliesCounts.map((item) => [item.boardId, item.count]),
       );
 
-      const results = (await boards).map((board) => {
+      const results = boards.map((board) => {
         const commentCount = commentCountMap.get(board.id) || 0;
         const repliesCount = repliesCountMap.get(board.id) || 0;
         return { board, commentCount, repliesCount };

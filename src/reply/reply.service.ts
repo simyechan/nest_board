@@ -27,7 +27,7 @@ export class ReplyService {
 
   async find(commentId: number): Promise<findReplyDto[]> {
     try {
-      const reply = this.replyRepository.find({
+      const reply = await this.replyRepository.find({
         where: { comments: { id: commentId } },
         relations: ['user'],
       });
@@ -36,7 +36,7 @@ export class ReplyService {
         throw new NotFoundException('답글을 찾을 수 없습니다.');
       }
 
-      return (await reply).map((reply) => {
+      return reply.map((reply) => {
         if (!reply.user) {
           throw new NotFoundException('작성자 정보가 누락되었습니다.');
         }

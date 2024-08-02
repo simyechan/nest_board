@@ -27,7 +27,7 @@ export class CommentService {
 
   async find(boardId: number): Promise<findCommentDto[]> {
     try {
-      const comment = this.commentRepository.find({
+      const comment = await this.commentRepository.find({
         where: { board: { id: boardId } },
         relations: ['user'],
       });
@@ -36,7 +36,7 @@ export class CommentService {
         throw new NotFoundException('댓글을 찾을 수 없습니다.');
       }
 
-      return (await comment).map((comment) => {
+      return comment.map((comment) => {
         if (!comment.user) {
           throw new NotFoundException('작성자 정보가 누락되었습니다.');
         }
@@ -77,7 +77,7 @@ export class CommentService {
       const { content } = updateCommentDto;
       this.commentRepository.update({ id: commentId }, { content });
     } catch (error) {
-      console.error('댓글 업데이트 중 오류가 발생', error);
+      console.error('댓글 업데이트 중 오류 발생', error);
     }
   }
 }
