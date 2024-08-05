@@ -8,6 +8,7 @@ import { Boards } from './board.entity';
 import { createBoardDto } from './dto/req/createBoard.dto';
 import { User } from 'src/user/board.user-entity';
 import { updateBoardDto } from './dto/req/updateBoard.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class BoardRepository extends Repository<Boards> {
@@ -17,9 +18,11 @@ export class BoardRepository extends Repository<Boards> {
 
   async createB(
     createBoardDto: createBoardDto,
-    file: Express.Multer.File,
+    req: Request,
+    file?: Express.Multer.File,
   ): Promise<Boards> {
-    const { name, ...other } = createBoardDto;
+    const user = req.user;
+    const { ...other } = createBoardDto;
 
     if (!file) {
       if (file.buffer) {
@@ -38,12 +41,6 @@ export class BoardRepository extends Repository<Boards> {
     await queryRunner.startTransaction();
 
     try {
-      let user = await queryRunner.manager.findOne(User, { where: { name } });
-      if (!user) {
-        user = queryRunner.manager.create(User, { name });
-        await queryRunner.manager.save(User, user);
-      }
-
       const board = queryRunner.manager.create(Boards, {
         ...other,
         image: file.path,
