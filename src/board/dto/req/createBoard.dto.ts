@@ -1,4 +1,4 @@
-export class createBoardDto {
+export class createReqBoardDto {
   title: string;
 
   contents: string;

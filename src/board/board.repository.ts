@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Boards } from './board.entity';
-import { createBoardDto } from './dto/req/createBoard.dto';
-import { User } from 'src/user/board.user-entity';
-import { updateBoardDto } from './dto/req/updateBoard.dto';
+import { createReqBoardDto } from './dto/req/createBoard.dto';
 import { Request } from 'express';
+import { updateResBoardDto } from './dto/res/updateBoard.dto';
+import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 
 @Injectable()
 export class BoardRepository extends Repository<Boards> {
@@ -17,7 +17,7 @@ export class BoardRepository extends Repository<Boards> {
   }
 
   async createB(
-    createBoardDto: createBoardDto,
+    createBoardDto: createReqBoardDto,
     req: Request,
     file?: Express.Multer.File,
   ): Promise<Boards> {
@@ -62,9 +62,9 @@ export class BoardRepository extends Repository<Boards> {
 
   async updateB(
     boardId: number,
-    updateBoardDto: updateBoardDto,
+    updateReqBoardDto: updateReqBoardDto,
     file: Express.Multer.File | undefined,
-  ): Promise<Boards> {
+  ): Promise<updateResBoardDto> {
     try {
       const board = await this.findOne({ where: { id: boardId } });
 
@@ -72,11 +72,11 @@ export class BoardRepository extends Repository<Boards> {
         throw new NotFoundException('게시물을 찾을 수 없습니다.');
       }
 
-      if (updateBoardDto.title !== undefined) {
-        board.title = updateBoardDto.title;
+      if (updateReqBoardDto.title !== undefined) {
+        board.title = updateReqBoardDto.title;
       }
-      if (updateBoardDto.contents !== undefined) {
-        board.contents = updateBoardDto.contents;
+      if (updateReqBoardDto.contents !== undefined) {
+        board.contents = updateReqBoardDto.contents;
       }
       if (file) {
         board.image = file.path;

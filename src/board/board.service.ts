@@ -6,13 +6,13 @@ import {
 import { Boards } from './board.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardRepository } from './board.repository';
-import { createBoardDto } from './dto/req/createBoard.dto';
-import { updateBoardDto } from './dto/req/updateBoard.dto';
 import { CommentRepository } from 'src/comment/comment.repository';
-import { Reply } from 'src/reply/reply.entity';
 import { ReplyRepository } from 'src/reply/reply.repository';
 import { Request } from 'express';
 import { User } from 'src/user/board.user-entity';
+import { updateResBoardDto } from './dto/res/updateBoard.dto';
+import { createReqBoardDto } from './dto/req/createBoard.dto';
+import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 
 @Injectable()
 export class BoardService {
@@ -90,12 +90,12 @@ export class BoardService {
   }
 
   async create(
-    createBoardDto: createBoardDto,
+    createReqBoardDto: createReqBoardDto,
     req: Request,
     file?: Express.Multer.File,
   ): Promise<Boards> {
     try {
-      return this.boardRepository.createB(createBoardDto, req, file);
+      return this.boardRepository.createB(createReqBoardDto, req, file);
     } catch (error) {
       console.error('게시물 생성 중 오류 발생', error);
     }
@@ -185,10 +185,10 @@ export class BoardService {
 
   async update(
     boardId: number,
-    updateBoardDto: updateBoardDto,
+    updateBoardDto: updateReqBoardDto,
     req: Request,
     file: Express.Multer.File | undefined,
-  ): Promise<createBoardDto> {
+  ): Promise<updateResBoardDto> {
     try {
       const user = req.user as User;
 

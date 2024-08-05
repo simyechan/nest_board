@@ -1,9 +1,7 @@
-import { updateBoardDto } from '../req/updateBoard.dto';
+import { updateReqBoardDto } from '../req/updateBoard.dto';
 
-export class createBoardDto {
-  boardId: number;
+export class updateResBoardDto {
+  title: string;
 
-  updateBoardDto: updateBoardDto;
-
-  file: Express.Multer.File | undefined;
+  contents: string;
 }

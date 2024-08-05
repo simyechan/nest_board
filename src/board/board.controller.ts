@@ -14,11 +14,11 @@ import {
 import { Boards } from './board.entity';
 import { BoardService } from './board.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createBoardDto } from './dto/req/createBoard.dto';
-import { updateBoardDto } from './dto/req/updateBoard.dto';
-import { Reply } from 'src/reply/reply.entity';
+import { createReqBoardDto } from './dto/req/createBoard.dto';
+import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { updateResBoardDto } from './dto/res/updateBoard.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -44,7 +44,7 @@ export class BoardsController {
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('image'))
   async create(
-    @Body() createBoardDto: createBoardDto,
+    @Body() createBoardDto: createReqBoardDto,
     @Req() req: Request,
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<Boards> {
@@ -65,10 +65,10 @@ export class BoardsController {
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('boardId') boardId: number,
-    @Body() updateBoardDto: updateBoardDto,
+    @Body() updateReqBoardDto: updateReqBoardDto,
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File | undefined,
-  ): Promise<createBoardDto> {
-    return this.boardService.update(boardId, updateBoardDto, req, file);
+  ): Promise<updateResBoardDto> {
+    return this.boardService.update(boardId, updateReqBoardDto, req, file);
   }
 }
