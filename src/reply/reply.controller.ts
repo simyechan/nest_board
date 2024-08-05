@@ -6,24 +6,29 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ReplyService } from './reply.service';
 import { createReplyDto } from './dto/req/createReply.dto';
 import { Reply } from './reply.entity';
 import { findReplyDto } from './dto/res/findReply.dto';
 import { updateReplyDto } from './dto/res/updateReply.dto';
+import { Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('reply')
 export class ReplyController {
   constructor(private replyService: ReplyService) {}
 
-  @Post(':commentId/:userId')
+  @Post(':commentId')
+  @UseGuards(AuthGuard('jwt'))
   async create(
     @Param('commentId') commentId: number,
-    @Param('userId') userId: string,
+    @Req() req: Request,
     @Body() createReplyDto: createReplyDto,
   ): Promise<Reply> {
-    return this.replyService.create(commentId, userId, createReplyDto);
+    return this.replyService.create(commentId, req, createReplyDto);
   }
 
   @Get(':commentId')
@@ -32,15 +37,18 @@ export class ReplyController {
   }
 
   @Delete(':replyId')
-  async delete(@Param('replyId') replyId): Promise<void> {
-    this.replyService.delete(replyId);
+  @UseGuards(AuthGuard('jwt'))
+  async delete(@Param('replyId') replyId, @Req() req: Request): Promise<void> {
+    this.replyService.delete(replyId, req);
   }
 
   @Patch(':replyId')
+  @UseGuards(AuthGuard('jwt'))
   async update(
     @Param('replyId') replyId,
+    @Req() req: Request,
     @Body() updateReplyDto: updateReplyDto,
   ): Promise<void> {
-    this.replyService.update(replyId, updateReplyDto);
+    this.replyService.update(replyId, req, updateReplyDto);
   }
 }
