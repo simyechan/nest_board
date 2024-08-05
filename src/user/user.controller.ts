@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { User } from './board.user-entity';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { mypageReqDto } from './dto/req/mypage.dto';
 
 @Controller('user')
 export class UserController {
@@ -12,7 +13,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   async mypage(
     @Req() req: Request
-  ): Promise<{ user: User; boardCount: number; commentCount: number }> {
+  ): Promise<mypageReqDto> {
     return this.userService.mypage(req);
   }
 

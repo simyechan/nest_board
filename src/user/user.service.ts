@@ -5,6 +5,7 @@ import { User } from './board.user-entity';
 import { BoardRepository } from 'src/board/board.repository';
 import { CommentRepository } from 'src/comment/comment.repository';
 import { Request } from 'express';
+import { mypageReqDto } from './dto/req/mypage.dto';
 
 @Injectable()
 export class UserService {
@@ -17,9 +18,7 @@ export class UserService {
     private commentRepository: CommentRepository,
   ) {}
 
-  async mypage(
-    req: Request,
-  ): Promise<{ user: User; boardCount: number; commentCount: number }> {
+  async mypage(req: Request): Promise<mypageReqDto> {
     try {
       const user = req.user as User;
       const userId = user.id;
