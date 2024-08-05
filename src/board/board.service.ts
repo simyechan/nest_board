@@ -14,6 +14,7 @@ import { updateResBoardDto } from './dto/res/updateBoard.dto';
 import { createReqBoardDto } from './dto/req/createBoard.dto';
 import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 import { findBoardDto } from './dto/res/findAllBoard.dto';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class BoardService {
@@ -24,6 +25,7 @@ export class BoardService {
     private commentRepository: CommentRepository,
     @InjectRepository(ReplyRepository)
     private replyRepository: ReplyRepository,
+    private dataSource: DataSource,
   ) {}
 
   async findAll(): Promise<findBoardDto[]> {
@@ -89,15 +91,47 @@ export class BoardService {
     req: Request,
     file?: Express.Multer.File,
   ): Promise<Boards> {
+    const user = req.user;
+    const { ...other } = createReqBoardDto;
+
+    if (!file) {
+      if (file.buffer) {
+        console.log('파일 버퍼 길이:', file.buffer.length);
+      } else {
+        console.error('파일 버퍼가 존재하지 않습니다.');
+        throw new Error('파일 버퍼가 존재하지 않습니다.');
+      }
+    } else {
+      console.log('파일이 제공되지 않았습니다.');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      return this.boardRepository.createB(createReqBoardDto, req, file);
+      const board = queryRunner.manager.create(Boards, {
+        ...other,
+        image: file.path,
+        user,
+      });
+
+      await queryRunner.manager.save(Boards, board);
+
+      await queryRunner.commitTransaction();
+
+      return board;
     } catch (error) {
-      console.error('게시물 생성 중 오류 발생', error);
+      await queryRunner.rollbackTransaction();
+      console.error(error);
+    } finally {
+      await queryRunner.release();
     }
   }
 
   async find(boardId: number): Promise<findBoardDto> {
-  // replies: Reply[];
+    // replies: Reply[];
     try {
       const board = await this.boardRepository.findOne({
         where: { id: boardId },
@@ -176,12 +210,13 @@ export class BoardService {
 
   async update(
     boardId: number,
-    updateBoardDto: updateReqBoardDto,
+    updateReqBoardDto: updateReqBoardDto,
     req: Request,
     file: Express.Multer.File | undefined,
   ): Promise<updateResBoardDto> {
     try {
       const user = req.user as User;
+      const { title, contents } = updateReqBoardDto;
 
       const board = await this.boardRepository.findOne({
         where: { id: boardId },
@@ -196,7 +231,19 @@ export class BoardService {
         throw new UnauthorizedException('게시물을 수정할 수 없습니다.');
       }
 
-      return this.boardRepository.updateB(boardId, updateBoardDto, file);
+      if (title !== undefined) {
+        board.title = title;
+      }
+      if (contents !== undefined) {
+        board.contents = contents;
+      }
+      if (file) {
+        board.image = file.path;
+      }
+
+      const result = await this.boardRepository.save(board);
+
+      return result;
     } catch (error) {
       if (
         error instanceof NotFoundException ||
