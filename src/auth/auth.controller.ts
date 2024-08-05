@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDto } from './Dto/userDto';
-import { AuthDto } from './Dto/res/AuthDto';
-import { Response } from 'express';
+import { UserDto } from './dto/userDto';
+import { AuthDto } from './dto/res/AuthDto';
+import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+// import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -20,5 +29,12 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthDto> {
     return this.authService.signIn(UserDto, response);
+  }
+
+  @Get('/test')
+  @UseGuards(AuthGuard())
+  test(@Req() request: Request) {
+    console.log('user');
+    return request.user;
   }
 }
