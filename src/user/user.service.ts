@@ -4,6 +4,7 @@ import { UserRepository } from './user.repository';
 import { User } from './board.user-entity';
 import { BoardRepository } from 'src/board/board.repository';
 import { CommentRepository } from 'src/comment/comment.repository';
+import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -17,10 +18,11 @@ export class UserService {
   ) {}
 
   async mypage(
-    userId: string,
+    req: Request,
   ): Promise<{ user: User; boardCount: number; commentCount: number }> {
     try {
-      const user = await this.userRepository.findOne({ where: { id: userId } });
+      const user = req.user as User;
+      const userId = user.id;
 
       if (!user) {
         throw new NotFoundException('사용자를 찾을 수 없습니다.');
