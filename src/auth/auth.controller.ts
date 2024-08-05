@@ -12,7 +12,6 @@ import { UserDto } from './dto/userDto';
 import { AuthDto } from './dto/res/AuthDto';
 import { Response, Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-// import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
