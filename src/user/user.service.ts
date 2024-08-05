@@ -26,26 +26,6 @@ export class UserService {
         throw new NotFoundException('사용자를 찾을 수 없습니다.');
       }
 
-      // subquery 사용
-      // const result = await this.userRepository
-      //   .createQueryBuilder('user')
-      //   .select([
-      //     'user.id',
-      //     '(SELECT COUNT(boards.id) FROM boards WHERE boards."userId" = user.id) AS boardCount',
-      //     '(SELECT COUNT(comment.id) FROM comment WHERE comment."userId" = user.id) AS commentCount',
-      //   ])
-      //   .where('user.id = :userId', { userId })
-      //   .getRawOne(); //innerjoin, subquery
-
-      // const boardCount = parseInt(result.boardCount, 10) || 0;
-      // const commentCount = parseInt(result.commentCount, 10) || 0;
-
-      // return {
-      //   user,
-      //   boardCount,
-      //   commentCount,
-      // };
-
       const [boardCountResult, commentCountResult] = await Promise.all([
         this.boardRepository
           .createQueryBuilder('board')
@@ -96,6 +76,26 @@ export class UserService {
 
 // const boardCount = parseInt(result.B, 10);
 // const commentCount = parseInt(result.C, 10);
+
+// return {
+//   user,
+//   boardCount,
+//   commentCount,
+// };
+
+// subquery 사용
+// const result = await this.userRepository
+//   .createQueryBuilder('user')
+//   .select([
+//     'user.id',
+//     '(SELECT COUNT(boards.id) FROM boards WHERE boards."userId" = user.id) AS boardCount',
+//     '(SELECT COUNT(comment.id) FROM comment WHERE comment."userId" = user.id) AS commentCount',
+//   ])
+//   .where('user.id = :userId', { userId })
+//   .getRawOne(); //innerjoin, subquery
+
+// const boardCount = parseInt(result.boardCount, 10) || 0;
+// const commentCount = parseInt(result.commentCount, 10) || 0;
 
 // return {
 //   user,
