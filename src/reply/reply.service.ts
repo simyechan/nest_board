@@ -1,5 +1,6 @@
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,12 +12,15 @@ import { findReplyDto } from './dto/res/findReply.dto';
 import { updateReplyDto } from './dto/res/updateReply.dto';
 import { Request } from 'express';
 import { User } from 'src/user/board.user-entity';
+import { DataSource } from 'typeorm';
+import { Comment } from 'src/comment/comment.entity';
 
 @Injectable()
 export class ReplyService {
   constructor(
     @InjectRepository(ReplyRepository)
     private replyRepository: ReplyRepository,
+    private dataSource: DataSource,
   ) {}
 
   async create(
@@ -24,10 +28,38 @@ export class ReplyService {
     req: Request,
     createReplyDto: createReplyDto,
   ): Promise<Reply> {
+    const { content } = createReplyDto;
+
     try {
-      return this.replyRepository.createR(commentId, req, createReplyDto);
+      const user = req.user as User;
+      const comment = await this.dataSource.getRepository(Comment).findOne({
+        where: { id: commentId },
+      });
+
+      if (!comment) {
+        throw new NotFoundException('댓글을 찾을 수 없습니다.');
+      }
+
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+
+      const reply = this.replyRepository.create({
+        content,
+        comments: comment,
+        userId: user.id,
+      });
+
+      await this.replyRepository.save(reply);
+
+      return reply;
     } catch (error) {
-      console.error('답글 생성 중 오류 발생', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        '답글 생성 중 오류가 발생했습니다.',
+      );
     }
   }
 
