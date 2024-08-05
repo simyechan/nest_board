@@ -27,9 +27,9 @@ export class BoardService {
 
   async findAll(): Promise<
     {
-      board: Boards;
       commentCount: number;
       repliesCount: number;
+      board: Boards;
     }[]
   > {
     try {
@@ -77,7 +77,7 @@ export class BoardService {
       const results = boards.map((board) => {
         const commentCount = commentCountMap.get(board.id) || 0;
         const repliesCount = repliesCountMap.get(board.id) || 0;
-        return { board, commentCount, repliesCount };
+        return { commentCount, repliesCount, board };
       });
 
       return results;
@@ -102,15 +102,15 @@ export class BoardService {
   }
 
   async find(boardId: number): Promise<{
-    board: Boards;
     commentCount: number;
-    replies: Reply[];
     repliesCount: number;
+    board: Boards;
+    // replies: Reply[];
   }> {
     try {
       const board = await this.boardRepository.findOne({
         where: { id: boardId },
-        relations: ['user', 'comments', 'comments.reply'],
+        relations: ['user', 'comments'],
       });
 
       if (!board) {
@@ -134,14 +134,14 @@ export class BoardService {
 
       const repliesCount = parseInt(repliesResult.count, 10);
 
-      const replyResult = await this.commentRepository.find({
-        where: { board: { id: boardId } },
-        relations: ['reply'],
-      });
+      // const replyResult = await this.commentRepository.find({
+      //   where: { board: { id: boardId } },
+      //   relations: ['reply'],
+      // });
 
-      const replies = replyResult.flatMap((comment) => comment.reply);
+      // const replies = replyResult.flatMap((comment) => comment.reply);
 
-      return { board, commentCount, replies, repliesCount };
+      return { commentCount, repliesCount, board };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -188,7 +188,7 @@ export class BoardService {
     updateBoardDto: updateBoardDto,
     req: Request,
     file: Express.Multer.File | undefined,
-  ): Promise<Boards> {
+  ): Promise<createBoardDto> {
     try {
       const user = req.user as User;
 

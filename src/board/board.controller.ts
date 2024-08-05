@@ -25,16 +25,17 @@ export class BoardsController {
   constructor(private boardService: BoardService) {}
 
   @Get()
-  async findAll(): Promise<{ board: Boards; commentCount: number }[]> {
+  async findAll(): Promise<
+    { commentCount: number; repliesCount: number; board: Boards }[]
+  > {
     return this.boardService.findAll();
   }
 
   @Get(':boardId')
   async find(@Param('boardId') boardId: number): Promise<{
-    board: Boards;
     commentCount: number;
-    replies: Reply[];
     repliesCount: number;
+    board: Boards;
   }> {
     return this.boardService.find(boardId);
   }
@@ -67,7 +68,7 @@ export class BoardsController {
     @Body() updateBoardDto: updateBoardDto,
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File | undefined,
-  ): Promise<Boards> {
+  ): Promise<createBoardDto> {
     return this.boardService.update(boardId, updateBoardDto, req, file);
   }
 }
