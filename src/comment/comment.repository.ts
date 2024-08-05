@@ -8,6 +8,7 @@ import { Comment } from './comment.entity';
 import { createCommentDto } from './dto/req/createComment.dto';
 import { Boards } from 'src/board/board.entity';
 import { User } from 'src/user/board.user-entity';
+import { Request } from 'express';
 
 @Injectable()
 export class CommentRepository extends Repository<Comment> {
@@ -20,12 +21,13 @@ export class CommentRepository extends Repository<Comment> {
 
   async createC(
     boardId: number,
-    userId: string,
+    req: Request,
     createCommentDto: createCommentDto,
   ): Promise<Comment> {
     const { content } = createCommentDto;
 
     try {
+      const user = req.user as User;
       const board = await this.dataSource.getRepository(Boards).findOne({
         where: { id: boardId },
       });
@@ -33,10 +35,6 @@ export class CommentRepository extends Repository<Comment> {
       if (!board) {
         throw new NotFoundException('게시물을 찾을 수 없습니다.');
       }
-
-      const user = await this.dataSource.getRepository(User).findOne({
-        where: { id: userId },
-      });
 
       if (!user) {
         throw new NotFoundException('사용자를 찾을 수 없습니다.');
