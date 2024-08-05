@@ -1,5 +1,6 @@
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,12 +12,15 @@ import { findCommentDto } from './dto/res/findComment.dto';
 import { updateCommentDto } from './dto/req/updateComment.dto';
 import { Request } from 'express';
 import { User } from 'src/user/board.user-entity';
+import { DataSource } from 'typeorm';
+import { Boards } from 'src/board/board.entity';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(CommentRepository)
     private commentRepository: CommentRepository,
+    private dataSource: DataSource,
   ) {}
 
   async create(
@@ -24,10 +28,38 @@ export class CommentService {
     req: Request,
     createCommentDto: createCommentDto,
   ): Promise<Comment> {
+    const { content } = createCommentDto;
+
     try {
-      return this.commentRepository.createC(boardId, req, createCommentDto);
+      const user = req.user as User;
+      const board = await this.dataSource.getRepository(Boards).findOne({
+        where: { id: boardId },
+      });
+
+      if (!board) {
+        throw new NotFoundException('게시물을 찾을 수 없습니다.');
+      }
+
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+
+      const comment = this.commentRepository.create({
+        content,
+        boardId: board.id,
+        userId: user.id,
+      });
+
+      await this.commentRepository.save(comment);
+
+      return comment;
     } catch (error) {
-      console.error('댓글 생성 중 오류 발생', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        '댓글 생성 중 오류가 발생했습니다.',
+      );
     }
   }
 
