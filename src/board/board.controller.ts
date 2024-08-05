@@ -19,24 +19,19 @@ import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { updateResBoardDto } from './dto/res/updateBoard.dto';
+import { findBoardDto } from './dto/res/findAllBoard.dto';
 
 @Controller('boards')
 export class BoardsController {
   constructor(private boardService: BoardService) {}
 
   @Get()
-  async findAll(): Promise<
-    { commentCount: number; repliesCount: number; board: Boards }[]
-  > {
+  async findAll(): Promise<findBoardDto[]> {
     return this.boardService.findAll();
   }
 
   @Get(':boardId')
-  async find(@Param('boardId') boardId: number): Promise<{
-    commentCount: number;
-    repliesCount: number;
-    board: Boards;
-  }> {
+  async find(@Param('boardId') boardId: number): Promise<findBoardDto> {
     return this.boardService.find(boardId);
   }
 

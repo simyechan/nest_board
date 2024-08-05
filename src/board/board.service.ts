@@ -13,6 +13,7 @@ import { User } from 'src/user/board.user-entity';
 import { updateResBoardDto } from './dto/res/updateBoard.dto';
 import { createReqBoardDto } from './dto/req/createBoard.dto';
 import { updateReqBoardDto } from './dto/req/updateBoard.dto';
+import { findBoardDto } from './dto/res/findAllBoard.dto';
 
 @Injectable()
 export class BoardService {
@@ -25,13 +26,7 @@ export class BoardService {
     private replyRepository: ReplyRepository,
   ) {}
 
-  async findAll(): Promise<
-    {
-      commentCount: number;
-      repliesCount: number;
-      board: Boards;
-    }[]
-  > {
+  async findAll(): Promise<findBoardDto[]> {
     try {
       const boards = await this.boardRepository.find({
         relations: ['user', 'comments'],
@@ -101,12 +96,8 @@ export class BoardService {
     }
   }
 
-  async find(boardId: number): Promise<{
-    commentCount: number;
-    repliesCount: number;
-    board: Boards;
-    // replies: Reply[];
-  }> {
+  async find(boardId: number): Promise<findBoardDto> {
+  // replies: Reply[];
     try {
       const board = await this.boardRepository.findOne({
         where: { id: boardId },
