@@ -29,11 +29,4 @@ export class AuthController {
   ): Promise<AuthDto> {
     return this.authService.signIn(UserDto, response);
   }
-
-  @Get('/test')
-  @UseGuards(AuthGuard())
-  test(@Req() request: Request) {
-    console.log('user');
-    return request.user;
-  }
 }
