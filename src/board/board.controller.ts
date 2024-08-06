@@ -70,7 +70,10 @@ export class BoardsController {
 
   // 검색 연습
   @Get('search')
-  async search(@Query('keyword') keyword: string): Promise<Boards[]> {
-    return await this.boardService.search(keyword);
+  async search(
+    @Query('keyword') keyword: string,
+    @Query('page') page = 1,
+  ): Promise<any> {
+    return await this.boardService.search(keyword, page);
   }
 }

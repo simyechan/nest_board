@@ -255,11 +255,22 @@ export class BoardService {
     }
   }
 
-  async search(keyword: string): Promise<Boards[]> {
-    return await this.boardRepository
+  async search(keyword: string, page: number): Promise<any> {
+    const skip = (page - 1) * 5;
+
+    const [result, total] = await this.boardRepository
       .createQueryBuilder('boards')
       .where('boards.title LIKE :keyword', { keyword: `%${keyword}%` })
       .orWhere('boards.contents LIKE :keyword', { keyword: `%${keyword}%` })
-      .getMany();
+      .skip(skip)
+      .take(5)
+      .getManyAndCount();
+
+    return {
+      result,
+      total,
+      page,
+      lastPage: Math.ceil(total / 5),
+    };
   }
 }
