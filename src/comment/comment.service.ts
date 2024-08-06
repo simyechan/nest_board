@@ -76,7 +76,7 @@ export class CommentService {
     try {
       const comment = await this.commentRepository.find({
         where: { board: { id: boardId } },
-        relations: ['user'],
+        relations: ['user', 'reply', 'reply.user'],
       });
 
       if (!comment) {
@@ -87,12 +87,30 @@ export class CommentService {
         if (!comment.user) {
           throw new NotFoundException('작성자 정보가 누락되었습니다.');
         }
+
         const first = comment.user.name.charAt(0);
         const last = comment.user.name.charAt(comment.user.name.length - 1);
+
         return {
           id: comment.id,
           content: comment.content,
           name: `${first}*${last}`,
+          reply: comment.reply.map((reply) => {
+            if (!reply.user) {
+              return {
+                id: reply.id,
+                content: reply.content,
+                name: null,
+              };
+            }
+            const rfirst = reply.user.name.charAt(0);
+            const rlast = reply.user.name.charAt(reply.user.name.length - 1);
+            return {
+              id: reply.id,
+              content: reply.content,
+              name: `${rfirst}*${rlast}`,
+            };
+          }),
         };
       });
     } catch (error) {

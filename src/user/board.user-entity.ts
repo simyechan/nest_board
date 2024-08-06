@@ -24,13 +24,13 @@ export class User extends BaseEntity {
   password: string;
 
   @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
-  comment: Comment;
+  comment: Comment[];
 
   @OneToMany(() => Boards, (board) => board.user, { cascade: true })
-  board: Boards;
+  board: Boards[];
 
   @OneToMany(() => Reply, (reply) => reply.user, { cascade: true })
-  reply: Reply;
+  reply: Reply[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createAt: Date;
