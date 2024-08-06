@@ -16,6 +16,7 @@ import { findReplyDto } from './dto/res/findReply.dto';
 import { updateReplyDto } from './dto/res/updateReply.dto';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { createReplyRes } from './dto/res/createReplyRes.dto';
 
 @Controller('reply')
 export class ReplyController {
@@ -27,7 +28,7 @@ export class ReplyController {
     @Param('commentId') commentId: number,
     @Req() req: Request,
     @Body() createReplyDto: createReplyDto,
-  ): Promise<Reply> {
+  ): Promise<createReplyRes> {
     return this.replyService.create(commentId, req, createReplyDto);
   }
 
