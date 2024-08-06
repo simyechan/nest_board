@@ -53,10 +53,13 @@ export class ReplyService {
 
       await this.replyRepository.save(reply);
 
+      const first = user.name.charAt(0);
+      const last = user.name.charAt(user.name.length - 1);
+
       return {
         id: reply.id,
         content,
-        name: user.name,
+        name: `${first}*${last}`,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -83,10 +86,12 @@ export class ReplyService {
         if (!reply.user) {
           throw new NotFoundException('작성자 정보가 누락되었습니다.');
         }
+        const first = reply.user.name.charAt(0);
+        const last = reply.user.name.charAt(reply.user.name.length - 1);
         return {
           id: reply.id,
           content: reply.content,
-          name: reply.user.name,
+          name: `${first}*${last}`,
         };
       });
     } catch (error) {

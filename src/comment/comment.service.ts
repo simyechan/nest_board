@@ -51,11 +51,14 @@ export class CommentService {
         userId: user.id,
       });
 
+      const first = user.name.charAt(0);
+      const last = user.name.charAt(user.name.length - 1);
+
       await this.commentRepository.save(comment);
 
       return {
         content,
-        name: user.name,
+        name: `${first}*${last}`,
         boardId: board.id,
         id: comment.id,
       };
@@ -84,10 +87,12 @@ export class CommentService {
         if (!comment.user) {
           throw new NotFoundException('작성자 정보가 누락되었습니다.');
         }
+        const first = comment.user.name.charAt(0);
+        const last = comment.user.name.charAt(comment.user.name.length - 1);
         return {
           id: comment.id,
           content: comment.content,
-          name: comment.user.name,
+          name: `${first}*${last}`,
         };
       });
     } catch (error) {
