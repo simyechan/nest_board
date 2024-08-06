@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -30,7 +31,7 @@ export class BoardsController {
     return this.boardService.findAll();
   }
 
-  @Get(':boardId')
+  @Get('/find/:boardId')
   async find(@Param('boardId') boardId: number): Promise<findBoardDto> {
     return this.boardService.find(boardId);
   }
@@ -65,5 +66,11 @@ export class BoardsController {
     @UploadedFile() file: Express.Multer.File | undefined,
   ): Promise<updateResBoardDto> {
     return this.boardService.update(boardId, updateReqBoardDto, req, file);
+  }
+
+  // 검색 연습
+  @Get('search')
+  async search(@Query('keyword') keyword: string): Promise<Boards[]> {
+    return await this.boardService.search(keyword);
   }
 }

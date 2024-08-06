@@ -254,4 +254,12 @@ export class BoardService {
       console.error('게시물 업데이트 중 오류 발생', error);
     }
   }
+
+  async search(keyword: string): Promise<Boards[]> {
+    return await this.boardRepository
+      .createQueryBuilder('boards')
+      .where('boards.title LIKE :keyword', { keyword: `%${keyword}%` })
+      .orWhere('boards.contents LIKE :keyword', { keyword: `%${keyword}%` })
+      .getMany();
+  }
 }
