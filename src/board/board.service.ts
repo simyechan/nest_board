@@ -38,46 +38,35 @@ export class BoardService {
         throw new NotFoundException('게시물을 찾을 수 없습니다');
       }
 
-      const boardIds = boards.map((board) => board.id);
-
-      const commentCounts = await this.commentRepository
+      const counts = await this.commentRepository
         .createQueryBuilder('comment')
         .select('comment.boardId', 'boardId')
-        .addSelect('COUNT(comment.id)', 'count')
-        .where('comment.boardId IN (:...boardIds)', { boardIds })
+        .addSelect('COUNT(comment.id)', 'commentCount')
+        .innerJoin('comment.reply', 'reply')
+        .addSelect('COUNT(reply.id)', 'repliesCount')
+        .where('comment.boardId IN (:...boardIds)', {
+          boardIds: boards.map((board) => board.id),
+        })
         .groupBy('comment.boardId')
         .getRawMany();
 
-      const commentCountMap = new Map(
-        commentCounts.map((item) => [item.boardId, parseInt(item.count, 10)]),
+      const countMap = new Map(
+        counts.map((item) => [
+          item.boardId,
+          {
+            commentCount: parseInt(item.commentCount, 10) || 0,
+            repliesCount: parseInt(item.repliesCount, 10) || 0,
+          },
+        ]),
       );
 
-      const repliesCounts = await Promise.all(
-        (await boards).map(async (board) => {
-          let repliesResult = await this.replyRepository
-            .createQueryBuilder('reply')
-            .select('COUNT(reply.id)', 'count')
-            .innerJoin('reply.comments', 'comment')
-            .where('comment.boardId = :boardId', { boardId: board.id })
-            .getRawOne();
-          return {
-            boardId: board.id,
-            count: (repliesResult = parseInt(repliesResult.count, 10) || 0),
-          };
-        }),
-      );
-
-      const repliesCountMap = new Map(
-        repliesCounts.map((item) => [item.boardId, item.count]),
-      );
-
-      const results = boards.map((board) => {
-        const commentCount = commentCountMap.get(board.id) || 0;
-        const repliesCount = repliesCountMap.get(board.id) || 0;
+      return boards.map((board) => {
+        const { commentCount, repliesCount } = countMap.get(board.id) || {
+          commentCount: 0,
+          repliesCount: 0,
+        };
         return { commentCount, repliesCount, board };
       });
-
-      return results;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
