@@ -162,7 +162,6 @@ export class BoardService {
         image: board.image,
         name: board.user.name,
         comment: comments,
-        reply: comments.flatMap((comment) => comment.reply),
       };
     } catch (error) {
       if (error instanceof NotFoundException) {

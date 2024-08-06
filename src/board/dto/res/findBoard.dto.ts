@@ -17,6 +17,4 @@ export class findBoardDto {
   name: string;
 
   comment: Comment[];
-
-  reply: Reply[];
 }
