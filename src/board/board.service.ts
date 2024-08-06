@@ -260,14 +260,20 @@ export class BoardService {
 
     const [result, total] = await this.boardRepository
       .createQueryBuilder('boards')
+      .leftJoinAndSelect('boards.user', 'user')
       .where('boards.title LIKE :keyword', { keyword: `%${keyword}%` })
       .orWhere('boards.contents LIKE :keyword', { keyword: `%${keyword}%` })
       .skip(skip)
       .take(5)
       .getManyAndCount();
 
+    const finalResult = result.map((board) => ({
+      ...board,
+      name: board.user.name,
+    }));
+
     return {
-      result,
+      result: finalResult,
       total,
       page,
       lastPage: Math.ceil(total / 5),
