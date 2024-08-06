@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { User } from 'src/user/board.user-entity';
 import { DataSource } from 'typeorm';
 import { Boards } from 'src/board/board.entity';
+import { createCommentRes } from './dto/res/createCommentRes.dto';
 
 @Injectable()
 export class CommentService {
@@ -27,7 +28,7 @@ export class CommentService {
     boardId: number,
     req: Request,
     createCommentDto: createCommentDto,
-  ): Promise<Comment> {
+  ): Promise<createCommentRes> {
     const { content } = createCommentDto;
 
     try {
@@ -52,7 +53,12 @@ export class CommentService {
 
       await this.commentRepository.save(comment);
 
-      return comment;
+      return {
+        content,
+        name: user.name,
+        boardId: board.id,
+        id: comment.id,
+      };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

@@ -16,6 +16,7 @@ import { findCommentDto } from './dto/res/findComment.dto';
 import { updateCommentDto } from './dto/req/updateComment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { createCommentRes } from './dto/res/createCommentRes.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -27,7 +28,7 @@ export class CommentController {
     @Param('boardId') boardId: number,
     @Req() req: Request,
     @Body() createCommentDto: createCommentDto,
-  ): Promise<Comment> {
+  ): Promise<createCommentRes> {
     return this.commentService.create(boardId, req, createCommentDto);
   }
 
