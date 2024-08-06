@@ -13,8 +13,9 @@ import { User } from 'src/user/board.user-entity';
 import { updateResBoardDto } from './dto/res/updateBoard.dto';
 import { createReqBoardDto } from './dto/req/createBoard.dto';
 import { updateReqBoardDto } from './dto/req/updateBoard.dto';
-import { findBoardDto } from './dto/res/findAllBoard.dto';
+import { findBoardDto } from './dto/res/findBoard.dto';
 import { DataSource } from 'typeorm';
+import { findAllBoardDto } from './dto/res/findAllBoard.dto';
 
 @Injectable()
 export class BoardService {
@@ -28,7 +29,7 @@ export class BoardService {
     private dataSource: DataSource,
   ) {}
 
-  async findAll(): Promise<findBoardDto[]> {
+  async findAll(): Promise<findAllBoardDto[]> {
     try {
       const boards = await this.boardRepository.find({
         relations: ['user', 'comments'],
@@ -120,7 +121,6 @@ export class BoardService {
   }
 
   async find(boardId: number): Promise<findBoardDto> {
-    // replies: Reply[];
     try {
       const board = await this.boardRepository.findOne({
         where: { id: boardId },
@@ -148,14 +148,22 @@ export class BoardService {
 
       const repliesCount = parseInt(repliesResult.count, 10);
 
-      // const replyResult = await this.commentRepository.find({
-      //   where: { board: { id: boardId } },
-      //   relations: ['reply'],
-      // });
+      const comments = await this.commentRepository.find({
+        where: { board: { id: boardId } },
+        relations: ['reply'],
+      });
 
-      // const replies = replyResult.flatMap((comment) => comment.reply);
-
-      return { commentCount, repliesCount, board };
+      return {
+        commentCount,
+        repliesCount,
+        id: board.id,
+        title: board.title,
+        contents: board.contents,
+        image: board.image,
+        name: board.user.name,
+        comment: comments,
+        reply: comments.flatMap((comment) => comment.reply),
+      };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

@@ -1,6 +1,6 @@
 import { Boards } from 'src/board/board.entity';
 
-export class findBoardDto {
+export class findAllBoardDto {
   commentCount: number;
 
   repliesCount: number;

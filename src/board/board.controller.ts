@@ -20,14 +20,15 @@ import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { updateResBoardDto } from './dto/res/updateBoard.dto';
-import { findBoardDto } from './dto/res/findAllBoard.dto';
+import { findBoardDto } from './dto/res/findBoard.dto';
+import { findAllBoardDto } from './dto/res/findAllBoard.dto';
 
 @Controller('boards')
 export class BoardsController {
   constructor(private boardService: BoardService) {}
 
   @Get()
-  async findAll(): Promise<findBoardDto[]> {
+  async findAll(): Promise<findAllBoardDto[]> {
     return this.boardService.findAll();
   }
 
