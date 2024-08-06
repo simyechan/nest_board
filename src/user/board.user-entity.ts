@@ -20,7 +20,7 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @Column({ nullable: true })
+  @Column()
   password: string;
 
   @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
