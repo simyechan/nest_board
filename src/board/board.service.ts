@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Boards } from './board.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -128,10 +129,6 @@ export class BoardService {
     const user = req.user;
     const { boards } = createMultipleBoardsDto;
 
-    if (!boards || boards.length === 0) {
-      throw new Error('게시물 데이터가 제공되지 않았습니다.');
-    }
-
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -156,7 +153,7 @@ export class BoardService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error('여러 게시물 생성 중 오류 발생', error);
-      throw error;
+      throw new BadRequestException('여러 게시물 생성 중 오류가 발생했습니다.');
     } finally {
       await queryRunner.release();
     }
