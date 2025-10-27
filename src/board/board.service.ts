@@ -12,6 +12,7 @@ import { Request } from 'express';
 import { User } from 'src/user/board.user-entity';
 import { updateResBoardDto } from './dto/res/updateBoard.dto';
 import { createReqBoardDto } from './dto/req/createBoard.dto';
+import { createMultipleBoardsDto } from './dto/req/createMultipleBoards.dto';
 import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 import { findBoardDto } from './dto/res/findBoard.dto';
 import { DataSource } from 'typeorm';
@@ -115,6 +116,47 @@ export class BoardService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error(error);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async createMultiple(
+    createMultipleBoardsDto: createMultipleBoardsDto,
+    req: Request,
+  ): Promise<Boards[]> {
+    const user = req.user;
+    const { boards } = createMultipleBoardsDto;
+
+    if (!boards || boards.length === 0) {
+      throw new Error('게시물 데이터가 제공되지 않았습니다.');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const createdBoards: Boards[] = [];
+
+      for (const boardData of boards) {
+        const board = queryRunner.manager.create(Boards, {
+          ...boardData,
+          user,
+        });
+
+        const savedBoard = await queryRunner.manager.save(Boards, board);
+        createdBoards.push(savedBoard);
+      }
+
+      await queryRunner.commitTransaction();
+
+      return createdBoards;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('여러 게시물 생성 중 오류 발생', error);
+      throw error;
     } finally {
       await queryRunner.release();
     }

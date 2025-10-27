@@ -16,6 +16,7 @@ import { Boards } from './board.entity';
 import { BoardService } from './board.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createReqBoardDto } from './dto/req/createBoard.dto';
+import { createMultipleBoardsDto } from './dto/req/createMultipleBoards.dto';
 import { updateReqBoardDto } from './dto/req/updateBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -46,6 +47,15 @@ export class BoardsController {
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<Boards> {
     return this.boardService.create(createBoardDto, req, file);
+  }
+
+  @Post('bulk')
+  @UseGuards(AuthGuard('jwt'))
+  async createMultiple(
+    @Body() createMultipleBoardsDto: createMultipleBoardsDto,
+    @Req() req: Request,
+  ): Promise<Boards[]> {
+    return this.boardService.createMultiple(createMultipleBoardsDto, req);
   }
 
   @Delete(':boardId')
