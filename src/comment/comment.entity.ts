@@ -31,9 +31,9 @@ export class Comment extends BaseEntity {
   @ManyToOne(() => Boards, (board) => board.comments)
   board: Boards;
 
-  @Column({type: 'int', nullable: true})
+  @Column({ type: 'int', nullable: true })
   @RelationId((comment: Comment) => comment.board)
-  boardId: number
+  boardId: number;
 
   @OneToMany(() => Reply, (reply) => reply.comments, { cascade: true })
   reply: Reply[];

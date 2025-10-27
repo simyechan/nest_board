@@ -4,12 +4,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserDto } from './dto/userDto';
+import { UserDto } from './Dto/userDto';
 import { UserRepository } from 'src/user/user.repository';
 import { User } from 'src/user/board.user-entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { AuthDto } from './dto/res/AuthDto';
+import { AuthDto } from './Dto/res/AuthDto';
 import { Response } from 'express';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { findReplyDto } from "src/reply/dto/res/findReply.dto";
+import { findReplyDto } from 'src/reply/dto/res/findReply.dto';
 
 export class findCommentDto {
   id: number;

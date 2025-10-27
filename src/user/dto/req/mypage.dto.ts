@@ -4,6 +4,6 @@ export class mypageReqDto {
   user: User;
 
   boardCount: number;
-  
+
   commentCount: number;
 }

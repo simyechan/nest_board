@@ -11,9 +11,7 @@ export class UserController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async mypage(
-    @Req() req: Request
-  ): Promise<mypageReqDto> {
+  async mypage(@Req() req: Request): Promise<mypageReqDto> {
     return this.userService.mypage(req);
   }
 
